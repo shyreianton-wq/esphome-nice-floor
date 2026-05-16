@@ -106,3 +106,19 @@ python nice_flor_s_decode.py 0x08DDC67F93D6CA
 - Tables précalculées alternatives : [Jev1337/NiceFlor-Encoder](https://github.com/Jev1337/NiceFlor-Encoder)
 - Reverse engineering original : [phreakerclub.com/1615](http://phreakerclub.com/1615)
 - Lib CC1101 : [LSatan/SmartRC-CC1101-Driver-Lib](https://github.com/LSatan/SmartRC-CC1101-Driver-Lib)
+
+## Licence
+
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+Ce projet est distribué sous licence **Creative Commons Attribution - Pas d'Utilisation Commerciale 4.0 International (CC BY-NC 4.0)**.
+
+Tu peux :
+- ✅ **Partager** — copier, redistribuer le matériel sous tout format ou support
+- ✅ **Adapter** — remixer, transformer et créer à partir du matériel
+
+À condition de :
+- 📝 **Attribuer** — créditer l'auteur, fournir un lien vers la licence, indiquer les modifications faites
+- 🚫 **Pas d'usage commercial** — pas de gain commercial, ni d'utilisation à des fins principalement commerciales
+
+Texte complet : [LICENSE](LICENSE) | Résumé : <https://creativecommons.org/licenses/by-nc/4.0/deed.fr>
