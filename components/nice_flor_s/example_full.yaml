@@ -1,0 +1,114 @@
+# ============================================================================
+# Exemple ESPHome complet pour cloner une Nice FLOR-S avec ESP32 + CC1101
+# ============================================================================
+# A coller dans <ton-dossier-esphome>/portail.yaml
+# Adapter:
+#   - wifi.ssid / wifi.password (via secrets.yaml)
+#   - nice_flor_s.serial (capture avec le firmware standalone)
+#   - nice_flor_s.initial_code (capture)
+# ============================================================================
+
+substitutions:
+  device_name: portail-garage
+  friendly_name: "Portail garage"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+# --- Connectivite -----------------------------------------------------------
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Hotspot de secours si le wifi tombe
+  ap:
+    ssid: "${device_name} Fallback"
+    password: !secret fallback_password
+
+captive_portal:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+  # Service callable depuis HA pour forcer le rolling code (pratique en debug)
+  actions:
+    - action: set_rolling_code
+      variables:
+        code: int
+      then:
+        - lambda: id(portail).set_rolling_code(code);
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+logger:
+  level: INFO
+  baud_rate: 0  # desactive le log UART (les delayMicroseconds du TX OOK n'aiment pas l'IRQ UART)
+
+# --- Composant Nice FLOR-S --------------------------------------------------
+external_components:
+  - source:
+      type: git
+      url: https://github.com/shyreianton-wq/esphome-nice-floor
+      ref: main
+    components: [nice_flor_s]
+    refresh: 1d
+
+nice_flor_s:
+  id: portail
+  cs_pin: 5                    # CC1101 CSN -> GPIO5
+  gdo0_pin: 2                  # CC1101 GDO0 -> GPIO2
+  serial: 0x12345678           # !!! REMPLACER par le serial capture de ta vraie telecommande
+  button: 1                    # bouton (1..4 typiquement)
+  initial_code: 0x0001         # !!! REMPLACER par le rolling code capture + marge
+  tx_power: 12                 # dBm: -30, -20, -15, -10, 0, 5, 7, 10, 11, 12
+
+# --- Entites exposees a Home Assistant --------------------------------------
+
+# Bouton "Ouvrir portail" dans HA
+button:
+  - platform: template
+    name: "Ouvrir"
+    icon: "mdi:gate-open"
+    on_press:
+      - lambda: id(portail).send_open();
+
+# Capteur du rolling code actuel (utile pour debug / monitoring)
+sensor:
+  - platform: template
+    name: "Rolling code"
+    icon: "mdi:counter"
+    accuracy_decimals: 0
+    lambda: return id(portail).get_rolling_code();
+    update_interval: 60s
+    entity_category: diagnostic
+
+# Sensors de diagnostic standards
+  - platform: wifi_signal
+    name: "WiFi RSSI"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: version
+    name: "ESPHome version"
+    entity_category: diagnostic
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP"
+      entity_category: diagnostic
+
+binary_sensor:
+  - platform: status
+    name: "Status"
