@@ -1,0 +1,41 @@
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# ESPHome
+.esphome/
+
+# Build artifacts
+*.bin
+*.elf
+*.hex
+*.o
+*.a
+*.factory.bin
+*.ota.bin
+
+# Logs
+*.log
+compile.log
+esphome_compile.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Fichiers locaux (peuvent contenir des valeurs personnelles)
+test_esphome.yaml
+secrets.yaml
+
+# Scratch / diag
+diag_serial.py
