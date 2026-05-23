@@ -78,10 +78,23 @@ button:
     icon: "mdi:gate-open"
     on_press:
       - lambda: id(portail).send_open();
+      # Publie un event HA (visible dans le Logbook, traceable en automation)
+      - homeassistant.event:
+          event: esphome.nice_flor_s_sent
+          data:
+            device: ${device_name}
+          data_template:
+            serial: !lambda 'char b[16]; snprintf(b, sizeof(b), "0x%08X", id(portail).get_serial()); return std::string(b);'
+            button: !lambda 'return to_string(id(portail).get_button());'
+            code: !lambda 'char b[8]; snprintf(b, sizeof(b), "0x%04X", id(portail).get_rolling_code()); return std::string(b);'
+      # Force la mise a jour immediate des sensors associes
+      - component.update: last_command_sensor
+      - component.update: rolling_code_sensor
 
 # Capteur du rolling code actuel (utile pour debug / monitoring)
 sensor:
   - platform: template
+    id: rolling_code_sensor
     name: "Rolling code"
     icon: "mdi:counter"
     accuracy_decimals: 0
@@ -100,6 +113,19 @@ sensor:
     entity_category: diagnostic
 
 text_sensor:
+  # Resume de la derniere commande emise (mis a jour a chaque appui)
+  - platform: template
+    id: last_command_sensor
+    name: "Derniere commande"
+    icon: "mdi:remote"
+    update_interval: never  # mis a jour seulement sur action explicite
+    lambda: |-
+      char buf[64];
+      snprintf(buf, sizeof(buf), "btn=%u code=0x%04X",
+               id(portail).get_button(),
+               id(portail).get_rolling_code());
+      return {std::string(buf)};
+
   - platform: version
     name: "ESPHome version"
     entity_category: diagnostic

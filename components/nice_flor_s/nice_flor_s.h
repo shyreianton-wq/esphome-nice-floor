@@ -31,6 +31,8 @@ class NiceFlorS : public Component {
   void set_rolling_code(uint16_t code);
 
   uint16_t get_rolling_code() const { return rolling_code_; }
+  uint32_t get_serial() const { return serial_; }
+  uint8_t  get_button() const { return button_; }
 
  protected:
   // Config
